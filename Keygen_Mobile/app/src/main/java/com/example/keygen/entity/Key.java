@@ -1,5 +1,7 @@
 package com.example.keygen.entity;
 
+import androidx.annotation.NonNull;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -81,5 +83,11 @@ public class Key {
         }
 
         return keys ;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return " key : "+this.key+" create_date : "+this.create_date ;
     }
 }

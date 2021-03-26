@@ -9,12 +9,24 @@
 
     <ListView
         android:id="@+id/list"
-        android:layout_below="@+id/rel"
+        android:layout_below="@+id/sort"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         />
 
+
+    <Button
+        android:id="@+id/sort"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="trier par date \u2193"
+        android:layout_below="@+id/rel"
+        android:layout_marginTop="10dp"
+        android:layout_alignParentRight="true"
+        >
+
+    </Button>
     <TextView
         android:id="@+id/key_gen"
         android:layout_width="wrap_content"

@@ -39,6 +39,8 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Button generate ;
     private Button save ;
+    private Button sort ;
     private TextView key_generate ;
 
     public static final String local_domain = "http://192.168.43.107:8000" ;
@@ -64,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String SAVE_API_URL = local_domain+"/keygen/api/save" ;
     public static final String DELETE_API_URL = local_domain+"/keygen/api/delete" ;
 
+    private boolean toggle ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,6 +133,38 @@ public class MainActivity extends AppCompatActivity {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+
+        // trier la liste par date de création
+
+        sort = (Button) findViewById(R.id.sort) ;
+        sort.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Collections.sort(keys, new Comparator<Key>() {
+                    public int compare(Key o1, Key o2) {
+                        if(!toggle)
+                            return o1.getCreate_date().compareTo(o2.getCreate_date());
+                        else
+                            return o2.getCreate_date().compareTo(o1.getCreate_date());
+                    }
+                });
+
+                if(!toggle)
+                {
+                    sort.setText("trier par date \u2191");
+                    toggle = true ;
+                }
+                else
+                {
+                    sort.setText("trier par date \u2193");
+                    toggle = false ;
+                }
+
+                keyListAdapter.setList(keys) ;
+                keyListAdapter.notifyDataSetChanged() ;
+            }
+        });
     }
 
 
