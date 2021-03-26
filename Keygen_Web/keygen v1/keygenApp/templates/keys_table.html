@@ -1,0 +1,65 @@
+
+
+
+
+
+<table id="keys_table" class="table" style="margin-top: 6% ; ">
+
+    <thead>
+        <tr>
+            <td>clé   <i class="fa fa-key"></i></td>
+            <td>date création  <i class="fa fa-calendar"></i></td>
+            <td>date expiration  <i class="fa fa-calendar"></i></td>
+            <td>utilisée</td>
+            <td></td>
+        </tr>
+    </thead>
+    
+    <tbody id="keys_table_body">
+        {% for data in keys %}
+        <tr>
+            <td id="key">{{data.key}}</td>
+            <td id="create_date">{{data.create_date|date:"j/m/o"}}</td>
+            <td id="expire_date">{{data.expire_date|date:"j/m/o"}}</td>
+            
+            {% if data.used %}
+                <td id="used"><i class="fa fa-check" style="color:green"></i></td>
+            {% else %}
+                <td id="used"><i class="fa fa-minus" style="color: orangered"></i></td>
+            {% endif %}
+            <td id="delete"><a  class="delete_button" style=" color:orangered; cursor : pointer ; "><i class="fa fa-trash"></i></a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <input type="hidden" id="delete_url" value="{% url 'keygenApp:delete' %}" >
+</table>
+
+
+<script>
+
+     // chercher le cookie qui contient le csrf token qui permettera à ajax d'envoyer des requètes à django
+    let cookie = document.cookie
+    let csrfToken = cookie.substring(cookie.indexOf('=') + 1)
+    
+    // supprimer la clé
+    $(document).on("click",".delete_button",function(){
+        
+        url = $('#delete_url').val() ; 
+        
+        key = $(this).parent().parent().find("#key").html() ; 
+        
+        $.ajax({
+            url : url ,
+            method : 'post' , 
+            data : { 'key' : key },
+            context : this, 
+            headers: {
+                'X-CSRFToken': csrfToken
+            },
+            success : function(result){
+                $(this).parent().parent().remove() ; 
+            }
+        })
+    }) ; 
+
+</script>

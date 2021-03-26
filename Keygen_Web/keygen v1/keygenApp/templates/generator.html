@@ -1,0 +1,128 @@
+
+
+
+{% extends "base.html"%}
+
+{% block content %}
+
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+<h1 style="margin-top: 2% ; ">Key Generator</h1>
+
+
+<div class="container" id="generator" style="margin-top: 2% ; width : 50% ;  ">
+    
+    <form id="save_form" enctype="multipart/form-data">
+        <!-- csrf token -->
+        {% csrf_token %}
+
+        <!-- utilisation du formset pour l'attribut key -->
+        <div class="row">
+        {{ form.key }}
+        </div>
+        <div class="row" style="margin-top: 2% ;">
+        <div class="col-sm-2"></div>
+        <button id="generate" type="button" class="btn btn-primary col-sm-3" data-url="{% url 'keygenApp:generate' %}">Générer</button>
+        <div class="col-sm-2"></div>
+        <input id="save" type="submit" class="btn btn-outline-success col-sm-3" value="Sauvegarder">
+        <div class="col-sm-2"></div>
+        </div>
+    </form>
+</div>
+
+
+ 
+{% include 'keys_table.html' %}
+
+
+<script>
+    
+$(document).ready(function () {
+
+    
+    //génération d'une clé
+    $('#generate').click(function(){
+        
+        
+    url = $(this).attr("data-url") ; 
+    
+    // chercher le cookie qui contient le csrf token qui permettera à ajax d'envoyer des requètes à django
+    let cookie = document.cookie
+    let csrfToken = cookie.substring(cookie.indexOf('=') + 1)
+    
+    // requète ajaxpour la génération, met à jour l'input de la clé par la valeur envoyé par le serveur
+    $.ajax({  
+            url: url,
+            type: 'post',
+            headers: {
+                'X-CSRFToken': csrfToken
+            },
+            success: function(result)
+            {
+                $('#key_field').val(result) ; 
+                
+            }
+        });
+    
+    console.log("success") ; 
+    });
+    
+    
+    
+    // save key
+    $('#save_form').submit(function(e){
+        
+        e.preventDefault();
+        
+        url = "{% url 'keygenApp:save' %}" ; 
+       
+        $.ajax({
+            url : url , 
+            method : "post",
+            data : { 'key' : $(this).parent().find("#key_field").val()},
+            headers: {
+                'X-CSRFToken': csrfToken
+            },
+            success : function(result){
+                
+                //jsres = $.parseJSON(result) 
+                if( typeof result["for"] != "undefined" ){
+                    alert(result['message']['key']) ;    
+                }
+                else
+                {
+                    
+                    // ajout dynamique d'une ligne à la table des clés
+                    
+                    used_row = "<td id='used'><i class='fa fa-minus' style='color:orangered'></i></td>" ;         
+
+                    if(result["used"]==1)
+                    {
+                         used_row = "<td id='used'><i class='fa fa-check' style='color:green'></i></td>" ;         
+                    }
+                  
+                    $("#keys_table_body tr:last").after(" <tr>"+
+                        "<td id='key'>"+result["key"]+"</td>"+
+                        "<td id='create_date'>"+result["create_date"]+"</td>"+
+                        "<td id='expire_date'>"+result["expire_date"]+"</td>"+
+                        used_row+ 
+                        "<td id='delete'><a  class='delete_button' style=' color:orangered; cursor : pointer ; '><i class='fa fa-trash'></i></a></td></tr>") ;
+
+
+                    }
+                
+                $("html, body").animate({ scrollTop: $(document).height() }, 1000);
+                
+                
+        }
+        })
+    }) ; 
+}) ; 
+    
+</script>
+
+{% endblock %}
