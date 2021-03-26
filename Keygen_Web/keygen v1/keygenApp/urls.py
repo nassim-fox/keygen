@@ -12,5 +12,6 @@ urlpatterns = [
     path('api/save',views.save,name="save"), 
     path('api/get_all',views.get_all,name="get_all"),
     path('api/get_key',views.get_key,name="get_key"),
-    path('api/delete',views.delete,name="delete")
+    path('api/delete',views.delete,name="delete"),
+    path('api/update',views.update,name="update")
 ]

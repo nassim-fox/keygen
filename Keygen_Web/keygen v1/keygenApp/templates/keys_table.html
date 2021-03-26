@@ -9,7 +9,7 @@
     <thead class="thead-light">
         <tr>
             <td>clé   <i class="fa fa-key"></i></td>
-            <td>date création  <i class="fa fa-calendar"></i></td>
+            <td id="sort_date_create">date création  <i class="fa fa-calendar"></i></td>
             <td>date expiration  <i class="fa fa-calendar"></i></td>
             <td>utilisée</td>
             <td></td>
@@ -24,15 +24,16 @@
             <td id="expire_date">{{data.expire_date|date:"j/m/o"}}</td>
             
             {% if data.used %}
-                <td id="used"><i class="fa fa-check" style="color:green"></i></td>
+            <td id="used" ><a id="used" class="used_change" style="cursor: pointer ;"><i class="fa fa-check" style="color:green"></i></a></td>
             {% else %}
-                <td id="used"><i class="fa fa-minus" style="color: orangered"></i></td>
+            <td id="used"><a id="unused" class="used_change" style="cursor: pointer ;"><i class="fa fa-minus" style="color: orangered"></i></a></td>
             {% endif %}
             <td id="delete"><a  class="delete_button" style=" color:orangered; cursor : pointer ; "><i class="fa fa-trash"></i></a></td>
         </tr>
         {% endfor %}
     </tbody>
     <input type="hidden" id="delete_url" value="{% url 'keygenApp:delete' %}" >
+    <input type="hidden" id="update_used_url" value="{% url 'keygenApp:update' %}" >
 </table>
     
 </div>
@@ -63,5 +64,39 @@
             }
         })
     }) ; 
-
+    
+    // modifier la clé ( changer le champs utilisé )
+    $(document).on("click",".used_change",function(){
+        
+        url = $('#update_used_url').val() ; 
+        
+        
+        key = $(this).parent().parent().find("#key").html() ; 
+        
+        used = 1 ; 
+        
+        if( $(this).attr("id")=="used")
+            used = 0 ;
+        else
+        {
+            used = 1 ;     
+        }
+        
+        
+        $.ajax({
+            url : url ,
+            method : 'post' , 
+            data : { 'key' : key, used : used },
+            context : this, 
+            headers: {
+                'X-CSRFToken': csrfToken
+            },
+            success : function(result){
+                location.reload(true) ; 
+            }
+        })
+    }) ; 
+    
+    
+    
 </script>

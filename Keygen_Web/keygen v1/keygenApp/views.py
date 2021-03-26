@@ -123,6 +123,25 @@ def get_key(request,key) :
     
     return HttpResponse(context)
 
+# changer clé utilisée ou non 
+def update(request):
+    
+    if request.method == 'POST' : 
+        # recevoir la clé à modifier
+        try :
+            key_from_request = request.POST.get("key")
+        except ObjectDoesNotExist as DoesNotExist :
+            return HttpResponse(json.dumps({'message':"key doesn't exist"},content_type="application/json"))
+        
+        #chercher la clé
+        k = Key.objects.get(key=key_from_request)
+        k.used = request.POST.get("used")
+        k.save() 
+        
+    
+    # retourner une liste json des entrés de la bdd 
+    results = [ob.as_json() for ob in Key.objects.all()]
+    return HttpResponse(json.dumps(results), content_type="application/json")
 
 
 #about

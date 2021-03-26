@@ -1,16 +1,22 @@
 package com.example.keygen;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,11 +30,14 @@ import org.json.JSONObject;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.CookieManager;
 import java.net.HttpCookie;
 import java.net.HttpURLConnection;
@@ -56,16 +65,17 @@ public class MainActivity extends AppCompatActivity {
     private Button generate ;
     private Button save ;
     private Button sort ;
+    private ImageButton pdf ;
     private TextView key_generate ;
 
     public static final String local_domain = "http://192.168.43.107:8000" ;
     public static final String domain = "https://keygenapp.herokuapp.com" ;
 
     // les url
-    public static final String GET_ALL_URL = local_domain+"/keygen/api/get_all" ;
-    public static final String GENERATE_API_URL = local_domain+"/keygen/api/generate" ;
-    public static final String SAVE_API_URL = local_domain+"/keygen/api/save" ;
-    public static final String DELETE_API_URL = local_domain+"/keygen/api/delete" ;
+    public static final String GET_ALL_URL = domain+"/keygen/api/get_all" ;
+    public static final String GENERATE_API_URL = domain+"/keygen/api/generate" ;
+    public static final String SAVE_API_URL = domain+"/keygen/api/save" ;
+    public static final String DELETE_API_URL = domain+"/keygen/api/delete" ;
 
     private boolean toggle ;
 
@@ -163,6 +173,44 @@ public class MainActivity extends AppCompatActivity {
 
                 keyListAdapter.setList(keys) ;
                 keyListAdapter.notifyDataSetChanged() ;
+            }
+
+
+        });
+
+        // enregistrer le fichier log
+        // ce fichier contient la liste des clés au moment de l'enregistrement
+        // il sera téléchargé dans le dossier downloads
+
+        pdf = (ImageButton) findViewById(R.id.pdf) ;
+        pdf.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                verifyStoragePermissions(MainActivity.this) ;
+
+                String date = java.text.DateFormat.getDateTimeInstance().format(new Date()) ;
+
+                PrintWriter out = null;
+                try {
+                    File f = new File( Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"keys_log_"+date+".txt") ;
+                    out = new PrintWriter(new FileWriter(f));
+                    Log.e("file", f.getPath());
+                    for (Key k : keys) {
+                        out.write(k.toString()+"\n");
+                    }
+
+                    Toast.makeText(MainActivity.this,"logs sauvegardé dans le repertoire de téléchargement", Toast.LENGTH_LONG).show() ;
+
+                } catch (IOException e) {
+                    System.err.println("Caught IOException: " +  e.getMessage());
+
+                } finally {
+                    if (out != null) {
+                        out.close();
+                    }
+                }
             }
         });
     }
@@ -333,6 +381,33 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    // Storage Permissions
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+
+    /**
+     * Checks if the app has permission to write to device storage
+     *
+     * If the app does not has permission then the user will be prompted to grant permissions
+     *
+     * @param activity
+     */
+    public static void verifyStoragePermissions(Activity activity) {
+        // Check if we have write permission
+        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }
+    }
 
 
 }

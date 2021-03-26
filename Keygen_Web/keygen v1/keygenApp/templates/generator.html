@@ -98,11 +98,11 @@ $(document).ready(function () {
                     
                     // ajout dynamique d'une ligne à la table des clés
                     
-                    used_row = "<td id='used'><i class='fa fa-minus' style='color:orangered'></i></td>" ;         
+                    used_row = "<td id='used'><a class='used_change' style='cursor: pointer ;'><i class='fa fa-minus' style='color:orangered'></i></a></td>" ;         
 
                     if(result["used"]==1)
                     {
-                         used_row = "<td id='used'><i class='fa fa-check' style='color:green'></i></td>" ;         
+                         used_row = "<td id='used'><a class='used_change' style='cursor: pointer ;'><i class='fa fa-check' style='color:green'></i></a></td>" ;         
                     }
                   
                     $("#keys_table_body tr:last").after(" <tr>"+

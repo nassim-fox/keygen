@@ -27,6 +27,17 @@
         >
 
     </Button>
+
+    <ImageButton
+        android:id="@+id/pdf"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/sort"
+        android:layout_below="@id/rel"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="20dp"
+        android:src="@drawable/ic_baseline_save_alt_24"
+        />
     <TextView
         android:id="@+id/key_gen"
         android:layout_width="wrap_content"

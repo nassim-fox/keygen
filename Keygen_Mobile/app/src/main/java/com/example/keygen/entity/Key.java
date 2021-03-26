@@ -88,6 +88,9 @@ public class Key {
     @NonNull
     @Override
     public String toString() {
-        return " key : "+this.key+" create_date : "+this.create_date ;
+        if(this.used)
+            return " key : "+this.key+" date creation : "+this.create_date+" date expiration : "+this.expire_date+" utilisee " ;
+
+        return " key : "+this.key+" date creation : "+this.create_date+" date expiration : "+this.expire_date+" non utilisee " ;
     }
 }
